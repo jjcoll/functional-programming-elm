@@ -43,3 +43,45 @@ encode key character =
 
     else
         character
+
+
+decode : Int -> Char -> Char
+decode key char =
+    encode -key char
+
+
+
+{-
+   Removes all non alphanumerica characters from a string,
+   not allowed to use String.filter for implementation
+-}
+
+
+normalize : String -> String
+normalize string =
+    -- returns Maybe tuple, handle with case of & Just and Nothing
+    case String.uncons string of
+        -- Base Case: When the string is empty, return an empty string to end the recursion
+        Nothing ->
+            ""
+
+        -- Recursive Step: Process the first character (head) and continue with the rest (tail).
+        Just ( head, tail ) ->
+            if Char.isAlpha head then
+                -- Keep the character and "cons" it onto the result of the recursive call.
+                String.cons head (normalize tail)
+
+            else
+                -- Discard the non-letter character and move to the next step.
+                normalize tail
+
+
+encrypt : Int -> String -> String
+encrypt key string =
+    case String.uncons string of
+        Nothing ->
+            ""
+
+        Just ( head, tail ) ->
+            -- no need to check for alpha characters as encrypt handles it already
+            String.cons (encode key head) (encrypt key tail)
