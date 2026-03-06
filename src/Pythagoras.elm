@@ -1,9 +1,5 @@
 module Pythagoras exposing (..)
 
-import String exposing (cons)
-
-
-
 -- Pythagoras triple is set of 3 positive integers a, b, c
 -- that satisfy a^2+b^2=c^2
 
@@ -45,6 +41,10 @@ isTrippleTuple ( x, y, z ) =
 pythTripple : ( Int, Int ) -> ( Int, Int, Int )
 pythTripple ( x, y ) =
     ( leg1 x y, leg2 x y, hyp x y )
+
+
+
+-- Week 2
 
 
 pythTriplesMap : List ( Int, Int ) -> List ( Int, Int, Int )

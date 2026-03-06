@@ -47,10 +47,11 @@ encode key character =
 
 decode : Int -> Char -> Char
 decode key char =
-    encode -key char
+    encode (0 - key) char
 
 
 
+-- Week 2
 {-
    Removes all non alphanumerica characters from a string,
    not allowed to use String.filter for implementation
@@ -85,3 +86,78 @@ encrypt key string =
         Just ( head, tail ) ->
             -- no need to check for alpha characters as encrypt handles it already
             String.cons (encode key head) (encrypt key tail)
+
+
+
+-- Week 3
+
+
+decrypt : Int -> String -> String
+decrypt key string =
+    encrypt (0 - key) string
+
+
+isPrefix : List Char -> List Char -> Bool
+isPrefix sub full =
+    -- SUBSTRING MATCHER (Helper)
+    -- Recursively checks if 'sub' list is found at the very start of the 'full' list
+    case ( sub, full ) of
+        -- empty sub means is prefix return true
+        ( [], _ ) ->
+            True
+
+        -- empty full means no characters left to compare return false
+        ( _, [] ) ->
+            False
+
+        -- if head of both match recursive call with tails, else return false no need to keep comparing
+        ( hSub :: tSub, hFull :: tFull ) ->
+            if hSub == hFull then
+                isPrefix tSub tFull
+
+            else
+                False
+
+
+recursiveSearch : List Char -> List Char -> Bool
+recursiveSearch sub full =
+    -- sliding window scanner, moves through the 'full' list character by character, attempting an isPrefix match at each step.
+    if isPrefix sub full then
+        True
+
+    else
+        case full of
+            [] ->
+                False
+
+            _ :: tail ->
+                recursiveSearch sub tail
+
+
+myContains : String -> String -> Bool
+myContains sub full =
+    -- we could avoid this function, but this way we avoid converting to a list on every recursive repetition
+    recursiveSearch (String.toList sub) (String.toList full)
+
+
+containsCanary : List String -> String -> Bool
+containsCanary canaries text =
+    -- Returns True if at least one string from the canaries list is present in the text.
+    let
+        filteredList =
+            List.filter (\canary -> myContains canary text) canaries
+    in
+    not (List.isEmpty filteredList)
+
+
+candidates : List String -> String -> List ( Int, String )
+candidates canaries encryptedText =
+    -- base function creates return type, we then filter through this list
+    let
+        keys =
+            List.range 1 25
+
+        listEncryptedText =
+            List.map (\key -> ( key, decrypt key encryptedText )) keys
+    in
+    List.filter (\( _, str ) -> containsCanary canaries str) listEncryptedText
